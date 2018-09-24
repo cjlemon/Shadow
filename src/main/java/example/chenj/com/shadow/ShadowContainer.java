@@ -71,7 +71,7 @@ public class ShadowContainer extends ViewGroup {
             drawablePath.lineTo(left, bottom - cornerRadius);
             drawablePath.arcTo(new RectF(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom), 180, -90, false);
             drawablePath.lineTo(right - cornerRadius, bottom);
-            drawablePath.arcTo(new RectF(right - 2 * cornerRadius, top - 2 * cornerRadius, right, top), 90, -90, false);
+            drawablePath.arcTo(new RectF(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom), 90, -90, false);
             drawablePath.lineTo(right, top - cornerRadius);
             drawablePath.arcTo(new RectF(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius), 0, -90, false);
             drawablePath.close();
