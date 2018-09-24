@@ -1,4 +1,4 @@
-package xhm.techuat.com.shadow;
+package example.chenj.com.shadow;
 
 import android.content.Context;
 import android.content.res.TypedArray;
