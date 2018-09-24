@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ShadowContainer">
+        <attr name="containerShadowColor" format="color"/>
+        <attr name="containerShadowRadius" format="dimension"/>
+        <attr name="containerDeltaLength" format="dimension"/>
+        <attr name="containerCornerRadius" format="dimension"/>
+        <attr name="deltaX" format="dimension"/>
+        <attr name="deltaY" format="dimension"/>
+    </declare-styleable>
+</resources>
