@@ -1,4 +1,4 @@
-package example.chenj.com.shadow;
+package com.xhqb.app.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -20,6 +20,7 @@ public class ShadowContainer extends ViewGroup {
     private final float deltaLength;
     private final float cornerRadius;
     private final Paint mShadowPaint;
+    private boolean drawShadow;
 
     public ShadowContainer(Context context) {
         this(context, null);
@@ -39,6 +40,7 @@ public class ShadowContainer extends ViewGroup {
         cornerRadius = a.getDimension(R.styleable.ShadowContainer_containerCornerRadius, 0);
         float dx = a.getDimension(R.styleable.ShadowContainer_deltaX, 0);
         float dy = a.getDimension(R.styleable.ShadowContainer_deltaY, 0);
+        drawShadow = a.getBoolean(R.styleable.ShadowContainer_enable, true);
         a.recycle();
         mShadowPaint = new Paint();
         mShadowPaint.setStyle(Paint.Style.FILL);
@@ -54,30 +56,40 @@ public class ShadowContainer extends ViewGroup {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        if (getLayerType() != LAYER_TYPE_SOFTWARE) {
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
-        View child = getChildAt(0);
-        int left = child.getLeft();
-        int top = child.getTop();
-        int right = child.getRight();
-        int bottom = child.getBottom();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            canvas.drawRoundRect(left, top, right, bottom, cornerRadius, cornerRadius, mShadowPaint);
-        } else {
-            Path drawablePath = new Path();
-            drawablePath.moveTo(left + cornerRadius, top);
-            drawablePath.arcTo(new RectF(left, top, left + 2 * cornerRadius, top + 2 * cornerRadius), -90, -90, false);
-            drawablePath.lineTo(left, bottom - cornerRadius);
-            drawablePath.arcTo(new RectF(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom), 180, -90, false);
-            drawablePath.lineTo(right - cornerRadius, bottom);
-            drawablePath.arcTo(new RectF(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom), 90, -90, false);
-            drawablePath.lineTo(right, top - cornerRadius);
-            drawablePath.arcTo(new RectF(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius), 0, -90, false);
-            drawablePath.close();
-            canvas.drawPath(drawablePath, mShadowPaint);
+        if (drawShadow) {
+            if (getLayerType() != LAYER_TYPE_SOFTWARE) {
+                setLayerType(LAYER_TYPE_SOFTWARE, null);
+            }
+            View child = getChildAt(0);
+            int left = child.getLeft();
+            int top = child.getTop();
+            int right = child.getRight();
+            int bottom = child.getBottom();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                canvas.drawRoundRect(left, top, right, bottom, cornerRadius, cornerRadius, mShadowPaint);
+            } else {
+                Path drawablePath = new Path();
+                drawablePath.moveTo(left + cornerRadius, top);
+                drawablePath.arcTo(new RectF(left, top, left + 2 * cornerRadius, top + 2 * cornerRadius), -90, -90, false);
+                drawablePath.lineTo(left, bottom - cornerRadius);
+                drawablePath.arcTo(new RectF(left, bottom - 2 * cornerRadius, left + 2 * cornerRadius, bottom), 180, -90, false);
+                drawablePath.lineTo(right - cornerRadius, bottom);
+                drawablePath.arcTo(new RectF(right - 2 * cornerRadius, bottom - 2 * cornerRadius, right, bottom), 90, -90, false);
+                drawablePath.lineTo(right, top + cornerRadius);
+                drawablePath.arcTo(new RectF(right - 2 * cornerRadius, top, right, top + 2 * cornerRadius), 0, -90, false);
+                drawablePath.close();
+                canvas.drawPath(drawablePath, mShadowPaint);
+            }
         }
         super.dispatchDraw(canvas);
+    }
+
+    public void setDrawShadow(boolean drawShadow){
+        if (this.drawShadow == drawShadow){
+            return;
+        }
+        this.drawShadow = drawShadow;
+        postInvalidate();
     }
 
     @Override
@@ -88,30 +100,30 @@ public class ShadowContainer extends ViewGroup {
         }
         View child = getChildAt(0);
         LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
-        int childBottomMargin = layoutParams.bottomMargin;
-        int childLeftMargin = layoutParams.leftMargin;
-        int childRightMargin = layoutParams.rightMargin;
-        int childTopMargin = layoutParams.topMargin;
+        int childBottomMargin = (int) (Math.max(deltaLength, layoutParams.bottomMargin) + 1);
+        int childLeftMargin = (int) (Math.max(deltaLength, layoutParams.leftMargin) + 1);
+        int childRightMargin = (int) (Math.max(deltaLength, layoutParams.rightMargin) + 1);
+        int childTopMargin = (int) (Math.max(deltaLength, layoutParams.topMargin) + 1);
         int widthMeasureSpecMode;
         int widthMeasureSpecSize;
         int heightMeasureSpecMode;
         int heightMeasureSpecSize;
         if (layoutParams.width == LayoutParams.MATCH_PARENT) {
             widthMeasureSpecMode = MeasureSpec.EXACTLY;
-            widthMeasureSpecSize = getMeasuredWidth() - layoutParams.leftMargin - layoutParams.rightMargin;
+            widthMeasureSpecSize = getMeasuredWidth() - childLeftMargin - childRightMargin;
         } else if (LayoutParams.WRAP_CONTENT == layoutParams.width) {
             widthMeasureSpecMode = MeasureSpec.AT_MOST;
-            widthMeasureSpecSize = getMeasuredWidth() - layoutParams.leftMargin - layoutParams.rightMargin;
+            widthMeasureSpecSize = getMeasuredWidth() - childLeftMargin - childRightMargin;
         } else {
             widthMeasureSpecMode = MeasureSpec.EXACTLY;
             widthMeasureSpecSize = layoutParams.width;
         }
         if (layoutParams.height == LayoutParams.MATCH_PARENT) {
             heightMeasureSpecMode = MeasureSpec.EXACTLY;
-            heightMeasureSpecSize = getMeasuredHeight() - layoutParams.bottomMargin - layoutParams.topMargin;
+            heightMeasureSpecSize = getMeasuredHeight() - childBottomMargin - childTopMargin;
         } else if (LayoutParams.WRAP_CONTENT == layoutParams.height) {
             heightMeasureSpecMode = MeasureSpec.AT_MOST;
-            heightMeasureSpecSize = getMeasuredHeight() - layoutParams.bottomMargin - layoutParams.topMargin;
+            heightMeasureSpecSize = getMeasuredHeight() - childBottomMargin - childTopMargin;
         } else {
             heightMeasureSpecMode = MeasureSpec.EXACTLY;
             heightMeasureSpecSize = layoutParams.height;

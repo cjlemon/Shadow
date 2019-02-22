@@ -7,5 +7,6 @@
         <attr name="containerCornerRadius" format="dimension"/>
         <attr name="deltaX" format="dimension"/>
         <attr name="deltaY" format="dimension"/>
+        <attr name="enable" format="boolean"/>
     </declare-styleable>
 </resources>
