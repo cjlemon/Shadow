@@ -98,6 +98,10 @@ public class ShadowContainer extends ViewGroup {
         if (getChildCount() != 1) {
             throw new IllegalStateException("子View只能有一个");
         }
+        int measuredWidth = getMeasuredWidth();
+        int measuredHeight = getMeasuredHeight();
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         View child = getChildAt(0);
         LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
         int childBottomMargin = (int) (Math.max(deltaLength, layoutParams.bottomMargin) + 1);
@@ -108,31 +112,41 @@ public class ShadowContainer extends ViewGroup {
         int widthMeasureSpecSize;
         int heightMeasureSpecMode;
         int heightMeasureSpecSize;
-        if (layoutParams.width == LayoutParams.MATCH_PARENT) {
-            widthMeasureSpecMode = MeasureSpec.EXACTLY;
-            widthMeasureSpecSize = getMeasuredWidth() - childLeftMargin - childRightMargin;
-        } else if (LayoutParams.WRAP_CONTENT == layoutParams.width) {
-            widthMeasureSpecMode = MeasureSpec.AT_MOST;
-            widthMeasureSpecSize = getMeasuredWidth() - childLeftMargin - childRightMargin;
-        } else {
-            widthMeasureSpecMode = MeasureSpec.EXACTLY;
-            widthMeasureSpecSize = layoutParams.width;
+        if (widthMode == MeasureSpec.UNSPECIFIED){
+            widthMeasureSpecMode = MeasureSpec.UNSPECIFIED;
+            widthMeasureSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+        }else {
+            if (layoutParams.width == LayoutParams.MATCH_PARENT) {
+                widthMeasureSpecMode = MeasureSpec.EXACTLY;
+                widthMeasureSpecSize = measuredWidth - childLeftMargin - childRightMargin;
+            } else if (LayoutParams.WRAP_CONTENT == layoutParams.width) {
+                widthMeasureSpecMode = MeasureSpec.AT_MOST;
+                widthMeasureSpecSize = measuredWidth - childLeftMargin - childRightMargin;
+            } else {
+                widthMeasureSpecMode = MeasureSpec.EXACTLY;
+                widthMeasureSpecSize = layoutParams.width;
+            }
         }
-        if (layoutParams.height == LayoutParams.MATCH_PARENT) {
-            heightMeasureSpecMode = MeasureSpec.EXACTLY;
-            heightMeasureSpecSize = getMeasuredHeight() - childBottomMargin - childTopMargin;
-        } else if (LayoutParams.WRAP_CONTENT == layoutParams.height) {
-            heightMeasureSpecMode = MeasureSpec.AT_MOST;
-            heightMeasureSpecSize = getMeasuredHeight() - childBottomMargin - childTopMargin;
-        } else {
-            heightMeasureSpecMode = MeasureSpec.EXACTLY;
-            heightMeasureSpecSize = layoutParams.height;
+        if (heightMode == MeasureSpec.UNSPECIFIED){
+            heightMeasureSpecMode = MeasureSpec.UNSPECIFIED;
+            heightMeasureSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+        }else {
+            if (layoutParams.height == LayoutParams.MATCH_PARENT) {
+                heightMeasureSpecMode = MeasureSpec.EXACTLY;
+                heightMeasureSpecSize = measuredHeight - childBottomMargin - childTopMargin;
+            } else if (LayoutParams.WRAP_CONTENT == layoutParams.height) {
+                heightMeasureSpecMode = MeasureSpec.AT_MOST;
+                heightMeasureSpecSize = measuredHeight - childBottomMargin - childTopMargin;
+            } else {
+                heightMeasureSpecMode = MeasureSpec.EXACTLY;
+                heightMeasureSpecSize = layoutParams.height;
+            }
         }
         measureChild(child, MeasureSpec.makeMeasureSpec(widthMeasureSpecSize, widthMeasureSpecMode), MeasureSpec.makeMeasureSpec(heightMeasureSpecSize, heightMeasureSpecMode));
         int parentWidthMeasureSpec = MeasureSpec.getMode(widthMeasureSpec);
         int parentHeightMeasureSpec = MeasureSpec.getMode(heightMeasureSpec);
-        int height = getMeasuredHeight();
-        int width = getMeasuredWidth();
+        int height = measuredHeight;
+        int width = measuredWidth;
         int childHeight = child.getMeasuredHeight();
         int childWidth = child.getMeasuredWidth();
         if (parentHeightMeasureSpec == MeasureSpec.AT_MOST){
@@ -147,7 +161,7 @@ public class ShadowContainer extends ViewGroup {
         if (height < childHeight + 2 * deltaLength){
             height = (int) (childHeight + 2 * deltaLength);
         }
-        if (height != getMeasuredHeight() || width != getMeasuredWidth()){
+        if (height != measuredHeight || width != measuredWidth){
             setMeasuredDimension(width, height);
         }
     }
